@@ -5,8 +5,8 @@ SELECT
 		isnull([SALIDAYENTRADA].[AuxDocNum], '0000') AS NumDocAsoc,
 		isnull(CONVERT(VARCHAR(10),[SALIDAYENTRADA].[AuxDocfec], 103), '') AS NumDocFec,
 		isnull(convert(numeric(10),[SALIDAYENTRADA].[Fecha]-[SALIDAYENTRADA].[AuxDocfec], 1), '0000') as DifDías,
-        case when nw_nventa.NumOC = '0' THEN 'Sin NV asociada' when nw_nventa.NumOC IS NULL THEN 'Sin NV asociada' when nw_nventa.NumOC = ' ' THEN 'Sin NV asociada' ELSE nw_nventa.NumOC END AS NumeroOC,
-        case when iw_gsaen.nvnumero = 0 THEN 'Sin NV asociada' ELSE CAST(iw_gsaen.nvnumero AS nvarchar(20)) end as NumeroNV,
+        case when nw_nventa.NumOC = '0' THEN 'Sin OC asociada' when nw_nventa.NumOC IS NULL THEN 'Sin OC asociada' when nw_nventa.NumOC = ' ' THEN 'Sin OC asociada' ELSE nw_nventa.NumOC END AS NumeroOC,
+        case when SALIDAYENTRADA.nvnumero = 0 THEN 'Sin NV asociada' ELSE CAST(SALIDAYENTRADA.nvnumero AS nvarchar(20)) end as NumeroNV,
         
   
 
@@ -82,10 +82,8 @@ FROM [PHARMATECH].[softland].[iw_gmovi] AS [MOVIMIENTOS]
 	ON [MST_Producto].[CodProd] = [MOVIMIENTOS].[CodProd]
 	LEFT JOIN [PHARMATECH].[softland].[cwpctas] AS [Cuentas]
 	ON [Cuentas].PCCODI = [TABLA_PRODUCTO].CtaVentas
-    INNER JOIN [PHARMATECH].[softland].[iw_gsaen] 
-    ON [iw_gsaen].[NroInt] = [MOVIMIENTOS].[NroInt]
-    INNER JOIN [PHARMATECH].[softland].[nw_nventa] 
-    ON [nw_nventa].[NVNumero] = [iw_gsaen].[nvnumero]
+   	LEFT JOIN [PHARMATECH].[softland].[nw_nventa] 
+  	ON [nw_nventa].[NVNumero] = [SALIDAYENTRADA].[nvnumero]
 
 	
 
@@ -98,5 +96,5 @@ WHERE  [SALIDAYENTRADA].[Estado] = 'V'
 GROUP BY   MOVIMIENTOS.TotalDescMov,MOVIMIENTOS.TotLinea, MOVIMIENTOS.DescMov01, MOVIMIENTOS.DescMov02,AUXILIARES.CodAux,MOVIMIENTOS.PreUniMB,DOCUMENTOSII.DocDes,MOVIMIENTOS.Partida,MOVIMIENTOS.CodProd, TABLA_PRODUCTO.DesProd,SALIDAYENTRADA.Tipo, SALIDAYENTRADA.Folio,VENDEDORES.VenDes,SALIDAYENTRADA.fecha,AUXILIARES.NomAux,
 				[MST_Cliente].categoria1,[MST_Cliente].categoria2,
 				MST_Producto.tipo, MST_Producto.linea, MST_Producto.sublinea, MST_Producto.modelo,MST_Producto.proveedor, [DOCUCONCEPTOS].DesCodDr, [SALIDAYENTRADA].[AuxDocNum],[SALIDAYENTRADA].[AuxDocfec],
-				[TABLA_PRODUCTO].CtaVentas,[TABLA_PRODUCTO].CtaCosto,iw_gsaen.Orden,iw_gsaen.nvnumero,nw_nventa.NumOC
+				[TABLA_PRODUCTO].CtaVentas,[TABLA_PRODUCTO].CtaCosto,SALIDAYENTRADA.nvnumero,nw_nventa.NumOC
 				ORDER BY  SALIDAYENTRADA.fecha DESC
